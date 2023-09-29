@@ -22,9 +22,9 @@ class furtiveFactory:
             return furtiveBmp(source)
         
         elif (source.lower().endswith(".png")):
-            return furtiveBmp()
+            pass
         else:
-            raise Exception("Incompatible image format.")
+            raise Exception("Incompatible media format.")
 
 class furtiveInterface:
     width = 0

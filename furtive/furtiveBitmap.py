@@ -6,6 +6,7 @@ from os import system, name
 from collections import OrderedDict
 from time import sleep, time
 from furtive.furtiveBase import furtiveInterface
+import random
 
 ''' 3rd Party Library '''
 from PIL import Image
@@ -26,7 +27,7 @@ class furtiveBmp(furtiveInterface):
     def Analyze(self, analysisType = "none"):  
         integerRepresentation = 0
         integerSizeInBits = 8
-        bitPos = 0
+        bitPos = 7
         lsbBytes = bytearray()
 
         for x in range(self.width):
@@ -35,14 +36,15 @@ class furtiveBmp(furtiveInterface):
 
                 for colorVal in pixel:
 
-                    if (bitPos == 0):
-                        #print(str(integerRepresentation))
-                        lsbBytes.append(integerRepresentation)
-                        bitPos = integerSizeInBits - 1
-                        integerRepresentation = 0
-                
                     integerRepresentation += (colorVal & 0b00000001) << bitPos
                     bitPos -= 1
+
+                    if (bitPos < 0):                       
+                        #print(str(integerRepresentation))
+                        lsbBytes.append(integerRepresentation)
+                        integerRepresentation = 0
+                        bitPos = 7
+                
 
         d = lsbBytes
 
@@ -64,6 +66,7 @@ class furtiveBmp(furtiveInterface):
         self._counter += 1
 
     def Reveal(self):
+        random.seed(time())
 
         message = bytearray()
         msgLengthBytes = [0,0,0,0]
@@ -103,21 +106,29 @@ class furtiveBmp(furtiveInterface):
 
         # hide the message
         for byteToHide in message:
-            self._HideByte(byteToHide)
+            randByte = random.randbytes(1)[0]
+            self._HideByte(randByte)
+#            self._HideByte(byteToHide)
 
     def _HideByte(self, value):         
          for i in range(7,-1,-1):
 
              if (self._currentCol >= self.width):
+                 # move to the next row
                  self._currentRow += 1
                  self._currentCol = 0
+
+                 # if we reached the end of the rows
                  if (self._currentRow >= self.height):
+                     # move to the next color
+                     self._currentRow = 0
                      self._colorIndex += 1
                      if (self._colorIndex > 2):
                          #TODO throw exception, out of room
-                         pass
+                         print("Out of space")
 
              bitToHide = value >> i
+             # clear all but the LSB
              bitToHide &= 0x01
 
              currentPix = self.Pix[self._currentCol, self._currentRow]
@@ -143,23 +154,27 @@ class furtiveBmp(furtiveInterface):
              
     def _RevealByte(self):     
          value = 0    
-         for i in range(7,-1,-1):
+         for bitPos in range(7,-1,-1):
 
              if (self._currentCol >= self.width):
+                 # move to the next row
                  self._currentRow += 1
                  self._currentCol = 0
+
+                 # if we reached the end of the rows
                  if (self._currentRow >= self.height):
+                     # move to the next color
+                     self._currentRow = 0
                      self._colorIndex += 1
                      if (self._colorIndex > 2):
-                         #TODO throw exception, out of room
-                         pass
+                         print("No more data")
 
              currentPix = self.Pix[self._currentCol, self._currentRow]
              
              curColorVal = currentPix[self._colorIndex] 
 
              if (curColorVal & 0x01):
-                 value += 0x01 << i
+                 value += 0x01 << bitPos
 
              # move to the next column
              self._currentCol += 1
