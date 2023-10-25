@@ -14,12 +14,18 @@ class furtiveFactory:
         pass
 
     @staticmethod
-    def Open(source, stegoParameters = None, mediaType = ""):     
+    def Open(source, analyze = False, stegoParameters = None, mediaType = ""):     
 
         if (source.lower().endswith(".bmp")):
-            # import the bmp type now that we know we need it
-            from furtive.furtiveBitmap import furtiveBmp
-            return furtiveBmp(source)
+            if (analyze):
+                # import the bmp type now that we know we need it
+                from furtive.furtiveBitmap import furtiveBmpAnalysis
+                return furtiveBmpAnalysis(source)
+            else:
+                # import the bmp type now that we know we need it
+                from furtive.furtiveBitmap import furtiveBmp
+                return furtiveBmp(source)
+
         
         elif (source.lower().endswith(".png")):
             pass
@@ -54,3 +60,5 @@ class furtiveInterface:
 
     def Capacity(self):
         pass
+
+

@@ -6,6 +6,7 @@ from os import system, name
 from collections import OrderedDict
 from time import sleep, time
 from furtive.furtiveBase import furtiveInterface
+from furtive.furtiveAnalysis import furtiveAnalysisInterface
 import random
 
 ''' 3rd Party Library '''
@@ -126,6 +127,7 @@ class furtiveBmp(furtiveInterface):
                      if (self._colorIndex > 2):
                          #TODO throw exception, out of room
                          print("Out of space")
+                         return -1
 
              bitToHide = value >> i
              # clear all but the LSB
@@ -152,6 +154,8 @@ class furtiveBmp(furtiveInterface):
              # move to the next column
              self._currentCol += 1
              
+         return 0
+
     def _RevealByte(self):     
          value = 0    
          for bitPos in range(7,-1,-1):
@@ -191,3 +195,49 @@ class furtiveBmp(furtiveInterface):
             return False
 
 
+class furtiveBmpAnalysis(furtiveBmp, furtiveAnalysisInterface):
+
+    def SaturateLsbs(self):
+
+        import random
+        from datetime import datetime
+        random.seed(datetime.now().timestamp())
+
+
+        self._currentRow = 0
+        self._currentCol = 0
+        self._colorIndex = 0
+
+
+        # hide until we can no longer
+        while (self._HideByte(random.randbytes(1)[0]) == 0):
+            pass
+
+    def GetLsbPairs(self):
+
+        # start with an empty dictionary
+        lsbPairs = {}
+
+        for x in range(self.width):
+            for y in range(self.height):
+
+                pixel = self.Pix[x,y]
+                    
+                # TODO: Handle more than just red!!
+                # what is the value of the lsb 
+                lsbValue = (pixel[0] & 0b00000001) 
+
+                # identify the pair by resetting the LSB
+                pairId = pixel[0] & 0b11111110
+
+                if (pairId in lsbPairs):
+                    # increcrement the count for k or k+1
+                    lsbPairs[pairId][lsbValue] += 1
+                else:
+                    # create the color pair entry
+                    pair = [0,0]
+                    pair[lsbValue] += 1
+
+                    # add the pair to the dictionary
+                    lsbPairs[pairId] = pair
+        return lsbPairs                              
