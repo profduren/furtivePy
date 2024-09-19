@@ -16,6 +16,10 @@ class furtiveFactory:
     @staticmethod
     def Open(source, analyze = False, stegoParameters = None, mediaType = ""):     
 
+        # import the bmp type now that we know we need it
+        from furtive.furtivePil import furtivePil
+        return furtivePil(source)        
+
         if (source.lower().endswith(".bmp")):
             if (analyze):
                 # import the bmp type now that we know we need it
@@ -24,11 +28,15 @@ class furtiveFactory:
             else:
                 # import the bmp type now that we know we need it
                 from furtive.furtiveBitmap import furtiveBmp
-                return furtiveBmp(source)
-
-        
+                return furtiveBmp(source)        
         elif (source.lower().endswith(".png")):
-            pass
+            # import the bmp type now that we know we need it
+            from furtive.furtivePil import furtivePil
+            return furtivePil(source)        
+        elif (source.lower().endswith(".jpg")):
+            # import the bmp type now that we know we need it
+            from furtive.furtivePil import furtivePil
+            return furtivePil(source)        
         else:
             raise Exception("Incompatible media format.")
 

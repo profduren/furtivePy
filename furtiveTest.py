@@ -1,6 +1,10 @@
 from furtive.furtiveBase import furtiveFactory
 from furtive.furtiveAnalysis import furtiveAnalysisLsb
 
+testCase1 = furtiveFactory.Open("n00433458_765_resized.png", True)
+testCase1.CalculateDigest()
+
+quit()
 
 testCase1 = furtiveFactory.Open("test.bmp", True)
 furtiveAnalysisLsb.Playground(testCase1)

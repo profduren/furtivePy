@@ -194,6 +194,23 @@ class furtiveBmp(furtiveInterface):
             print("Error Saving Image: "+str(err))
             return False
 
+    def calculateDigest(self, method = 0):  
+
+        # digest is based on Chen 
+        # convert the image to greyscale
+        self.img.convert('L')
+
+        # split the image into 9 non-overlapping frames
+        frameWidth = self.img.width / 3
+        frameHeight = self.img.height / 3
+
+        # processes each frame and obtain the average intensity 
+        #  TBD
+
+        
+
+        pass      
+
 
 class furtiveBmpAnalysis(furtiveBmp, furtiveAnalysisInterface):
 
